@@ -1,7 +1,7 @@
 {
   "name": "x-uploader-vue",
   "description": "Vue component for chunk upload",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": false,
   "keywords": [
     "vue",
@@ -11,13 +11,13 @@
     "sprakmd5"
   ],
   "license": "MIT",
-  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "lib": "vue-cli-service build --target lib --name xuploader --dest lib packages/index.js"
   },
+  "main": "lib/xuploader.umd.js",
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
