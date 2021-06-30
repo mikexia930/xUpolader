@@ -40,7 +40,8 @@ export default {
           method: 'post',
           url: '/fileUpload',
           data: {
-            uid: 'wu_1f90kpj7f1cf5s0hiaf1fae1dvk5',
+            userId: 4378,
+            projectId: 2,
           },
         }, // 上传地址
         checkUrl: {
@@ -48,7 +49,8 @@ export default {
           method: 'post',
           url: '/checkFileMd5', // 断点续传时候，校验已传文件情况
           data: {
-            uid: 'wu_1f90kpj7f1cf5s0hiaf1fae1dvk5',
+            userId: 4378,
+            projectId: 2,
           },
         }, // 断点续传验证地址
         timeout: 1000000, // 单位毫秒
@@ -101,16 +103,16 @@ export default {
         });
       }
     },
-    createUploadFiles(index, upFiles, fileKey) {
+    createUploadFiles(index, upFile, fileKey) {
       this.upFiles.splice(index, 1, {
-        key: `${upFiles.name}-${index}`, // 需保证唯一
-        file: upFiles,
+        key: `${upFile.name}-${index}`, // 需保证唯一
+        file: upFile,
         params: {
           md5: fileKey, // 文件hash
-          name: upFiles.name,
-          type: upFiles.type,
-          size: upFiles.size,
-          lastModifiedDate: upFiles.lastModifiedDate,
+          fileName: upFile.name,
+          type: upFile.type,
+          size: upFile.size,
+          lastModifiedDate: upFile.lastModifiedDate,
         },
         status: 'wait',
         progress: 0,
@@ -210,21 +212,35 @@ export default {
           case 'check':
             switch (emitData.status) {
               case 'checked':
+                switch (emitData.result.data.status.toString()) {
+                  case '0': // 已上传
+                    this.upFiles.splice(fileIndex, 1, {
+                      ...this.upFiles[fileIndex],
+                      status: 'success',
+                      progress: 100,
+                    });
+                    break;
+                  case '2': // 续传
+                    this.upFiles.splice(fileIndex, 1, {
+                      ...this.upFiles[fileIndex],
+                      status: 'continue',
+                      progress: 0,
+                      waiting: emitData.result.data.data,
+                    });
+                    break;
+                  case '1': // 未上传
+                  default:
+                    this.upFiles.splice(fileIndex, 1, {
+                      ...this.upFiles[fileIndex],
+                      status: 'upload',
+                      progress: 0,
+                    });
+                    break;
+                }
+                break;
               case 'checkErr':
               default:
-                if (emitData.result?.data?.status?.value === 100) {
-                  this.upFiles.splice(fileIndex, 1, {
-                    ...this.upFiles[fileIndex],
-                    status: 'success',
-                    progress: 100,
-                  });
-                } else {
-                  this.upFiles.splice(fileIndex, 1, {
-                    ...this.upFiles[fileIndex],
-                    status: 'upload',
-                    progress: 0,
-                  });
-                }
+                console.log(emitData.result);
                 break;
             }
             break;

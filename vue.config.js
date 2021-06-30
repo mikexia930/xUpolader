@@ -21,11 +21,11 @@ module.exports = {
     https: false, // 是否使用https协议
     proxy: {
       '/api': {
-        target: 'http://172.26.202.103:9090', // API服务器的地址
+        target: 'http://172.26.202.103:8998', // API服务器的地址
         ws: true, // 代理websockets
         changeOrigin: true, // 是否跨域，虚拟的站点需要更管origin
         pathRewrite: {
-          '^/api/': '/index/',
+          '^/api/': '/upload/',
         },
       },
     },

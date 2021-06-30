@@ -6,7 +6,7 @@
 demo可参考源码中的示例代码
 
 ## 版本
-- v1.0.2
+- v1.0.6
 
 ## 基于
 - vue2
@@ -21,7 +21,8 @@ npm install x-uploader-vue
 ## 使用
 **在main.js引入**
 ```
-import XUplaoder from 'x-uploader';
+import XUploader from 'x-uploader-vue';
+vue.use(XUploader);
 ```
 **在组件中使用**
 ```
@@ -78,9 +79,10 @@ uploadFiles.push({
     file: fileDom[0], // 上传的文件
     params: {
       md5: fileKey, // 必传，demo使用的是文件hash，也可以设置其它类型的key，用于断点续传。
-    }, // 上传时参数，会和文件参数合并，可手动设置接口所需的参数
-    status: 'wait', // wait-待上传 hash-文件hash中 upload-文件上传中 success-上传成功
+    }, // y断点验证和上传时使用的参数，会和文件参数合并，可手动设置接口所需的参数
+    status: 'wait', // wait-待上传 hash-文件hash中 continue-待续传 upload-文件上传中 success-上传成功
     progress: 0, // hash时为hash时进度，upload时为上传进度，数值类型，当前百分比比例
+    waiting: [] // 状态为continue才需要，接口返回的 "未续传" 的切片列表
 });
 ```
 **上传参数，保留字段。其余可在uploadFiles里的params设置**
