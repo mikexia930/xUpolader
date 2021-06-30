@@ -1,7 +1,7 @@
 {
   "name": "x-uploader-vue",
   "description": "Vue component for chunk upload",
-  "version": "1.0.2",
+  "version": "1.0.6",
   "private": false,
   "keywords": [
     "vue",

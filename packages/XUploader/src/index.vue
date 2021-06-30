@@ -76,9 +76,7 @@ export default {
           fileKey,
           status: 'check',
         });
-        Object.assign(this.uploadConfig.checkUrl.data, {
-          md5: upFile.params.md5,
-        });
+        Object.assign(this.uploadConfig.checkUrl.data, upFile.params);
         this.getAxios().request(this.uploadConfig.checkUrl).then((result) => {
           this.emitTo('check', {
             fileKey,
@@ -166,6 +164,25 @@ export default {
             case 'success':
               deleteStatus = 'alreadyUpload';
               break;
+            case 'continue':
+              if (Array.isArray(curFile.waiting) && curFile.waiting.length > 0) {
+                curFile.waiting = (curFile.waiting).map((item) => parseInt(item, 10));
+                this.upQueue[fileKey].wait.forEach((chunkIndex, index) => {
+                  if (!(curFile.waiting).includes(chunkIndex)) {
+                    this.upQueue[fileKey].wait.splice(index, 1);
+                    this.upQueue[fileKey].success.push(chunkIndex);
+                  }
+                });
+              }
+              this.emitTo('status', {
+                fileKey,
+                status: 'upload',
+                progress: this.getProgress(
+                  (this.upQueue[fileKey].success).length,
+                  this.upQueue[fileKey].max,
+                ),
+              });
+              break;
             case 'upload':
               if (this.upQueue[fileKey].wait.length > 0) {
                 this.upQueue[fileKey].wait.forEach((chunkIndex, index) => {
@@ -208,6 +225,9 @@ export default {
         }
       });
     },
+    getProgress(successLength, maxLength) {
+      return ((successLength / maxLength) * 100).toFixed(2);
+    },
     /**
      * 传输完成，并发数量减1
      * 传输成功，1、减少 wait 队列，2、更新进度
@@ -225,7 +245,7 @@ export default {
         let curStatus = 'success';
         if (successLength < this.upQueue[fileKey].max) {
           curStatus = 'upload';
-          curProgress = ((successLength / this.upQueue[fileKey].max) * 100).toFixed(2);
+          curProgress = this.getProgress(successLength, this.upQueue[fileKey].max);
         }
         if (this.errFileKeys.length > 0) {
           const errIndex = this.errFileKeys.findIndex(fileKey);
