@@ -57,7 +57,7 @@ export default {
         testTimes: 2, // 错误重试次数
       },
       chunkConfig: {
-        size: 5, // 单位M，切片大小
+        size: 3, // 单位M，切片大小
         posts: 5, // 单文件同时发起的请求数，同时并发
       },
       upFiles: [],
