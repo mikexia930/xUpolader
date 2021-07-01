@@ -81,7 +81,7 @@ export default {
           this.emitTo('check', {
             fileKey,
             status: 'checked',
-            result,
+            result: result.data,
           });
         }).catch((err) => {
           // 验证失败，则直接进入重新上传
@@ -174,7 +174,7 @@ export default {
                   }
                 });
               }
-              this.emitTo('status', {
+              this.emitTo('upload', {
                 fileKey,
                 status: 'upload',
                 progress: this.getProgress(
@@ -262,7 +262,6 @@ export default {
         });
       }).catch((err) => {
         console.log(err);
-        this.postsNumber -= 1;
         this.errFileKeys.push(fileKey);
         this.initQueue();
         this.emitTo('upload', {

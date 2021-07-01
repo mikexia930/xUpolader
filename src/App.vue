@@ -109,7 +109,7 @@ export default {
         file: upFile,
         params: {
           md5: fileKey, // 文件hash
-          fileName: upFile.name,
+          fileName: encodeURIComponent(upFile.name),
           type: upFile.type,
           size: upFile.size,
           lastModifiedDate: upFile.lastModifiedDate,
