@@ -76,7 +76,11 @@ export default {
           fileKey,
           status: 'check',
         });
-        Object.assign(this.uploadConfig.checkUrl.data, upFile.params);
+        Object.assign(
+          this.uploadConfig.checkUrl.data,
+          upFile.params,
+          { chunkSize: this.chunkSize },
+        );
         this.getAxios().request(this.uploadConfig.checkUrl).then((result) => {
           this.emitTo('check', {
             fileKey,
