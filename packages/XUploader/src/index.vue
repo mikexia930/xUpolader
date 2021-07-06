@@ -243,27 +243,35 @@ export default {
       Object.assign(this.uploadConfig.uploadUrl.data, params);
       this.uploadConfig.uploadUrl.timeout = this.uploadConfig.timeout;
       this.getAxios().request(this.uploadConfig.uploadUrl).then((result) => {
-        this.upQueue[fileKey].success.push(chunkIndex);
-        const successLength = this.upQueue[fileKey].success.length;
-        let curProgress = 100;
-        let curStatus = 'success';
-        if (successLength < this.upQueue[fileKey].max) {
-          curStatus = 'upload';
-          curProgress = this.getProgress(successLength, this.upQueue[fileKey].max);
-        }
-        if (this.errFileKeys.length > 0) {
-          const errIndex = this.errFileKeys.findIndex(fileKey);
-          if (errIndex > -1) {
-            this.errFileKeys.splice(errIndex, 1);
+        if (this.upQueue && this.upQueue[fileKey]) {
+          this.upQueue[fileKey].success.push(chunkIndex);
+          const successLength = this.upQueue[fileKey].success.length;
+          let curProgress = 100;
+          let curStatus = 'success';
+          if (successLength < this.upQueue[fileKey].max) {
+            curStatus = 'upload';
+            curProgress = this.getProgress(successLength, this.upQueue[fileKey].max);
           }
+          if (this.errFileKeys.length > 0) {
+            const errIndex = this.errFileKeys.findIndex(fileKey);
+            if (errIndex > -1) {
+              this.errFileKeys.splice(errIndex, 1);
+            }
+          }
+          this.postsNumber -= 1;
+          this.emitTo('upload', {
+            fileKey,
+            status: curStatus,
+            progress: curProgress,
+            result,
+          });
+        } else {
+          this.emitTo('upload', {
+            fileKey,
+            status: 'uploadErr',
+            result: 'file not exists',
+          });
         }
-        this.postsNumber -= 1;
-        this.emitTo('upload', {
-          fileKey,
-          status: curStatus,
-          progress: curProgress,
-          result,
-        });
       }).catch((err) => {
         console.log(err);
         this.errFileKeys.push(fileKey);
