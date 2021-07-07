@@ -243,6 +243,7 @@ export default {
       Object.assign(this.uploadConfig.uploadUrl.data, params);
       this.uploadConfig.uploadUrl.timeout = this.uploadConfig.timeout;
       this.getAxios().request(this.uploadConfig.uploadUrl).then((result) => {
+        this.postsNumber -= 1;
         if (this.upQueue && this.upQueue[fileKey]) {
           this.upQueue[fileKey].success.push(chunkIndex);
           const successLength = this.upQueue[fileKey].success.length;
@@ -258,7 +259,6 @@ export default {
               this.errFileKeys.splice(errIndex, 1);
             }
           }
-          this.postsNumber -= 1;
           this.emitTo('upload', {
             fileKey,
             status: curStatus,
